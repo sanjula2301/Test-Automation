@@ -1,0 +1,123 @@
+
+
+# variables:
+#   ANDROID24_EMULATOR_START_SCRIPT:
+#    value: "/opt/start-android24-emulator.sh" 
+#    description: "Android 24 emulator"
+
+#   ANDROID28_EMULATOR_START_SCRIPT:
+#      value: "/opt/start-android28-emulator.sh" 
+#      description: "Android 28 emulator"
+     
+#   ANDROID29_EMULATOR_START_SCRIPT:
+#      value: "/opt/start-android29-emulator.sh" 
+#      description: "Android 29 emulator"  
+
+
+
+
+
+# test:
+#   tags:
+#     - android
+#   image: $CI_REGISTRY_IMAGE
+#   stage: test
+#   # rules:
+#   #   - if: '$CI_PIPELINE_SOURCE != "schedule"'
+#   services:
+#     - name: docker:20.10.16-dind
+#   script:
+#     - appium &
+#     - /opt/start-android28-emulator.sh 
+#     - mvn test -P run-tests
+#     - adb devices
+#     - sleep 30
+
+
+
+
+
+# variables:
+#   SELECTED_EMULATOR_VERSION:
+#     description: "Select Android emulator version"
+#     value: "ANDROID25"
+#     options:
+#       - "ANDROID25"
+#       - "ANDROID28"
+#       - "ANDROID29"
+
+# test:
+#   tags:
+#     - android
+#   image: $CI_REGISTRY_IMAGE
+#   stage: test
+#   script:
+#     - appium &
+#     - |
+#       case "$SELECTED_EMULATOR_VERSION" in
+#         ANDROID25)
+#           /opt/start-android25-emulator.sh ;;
+#         ANDROID28)
+#           /opt/start-android28-emulator.sh ;;
+#         ANDROID29)
+#           /opt/start-android29-emulator.sh ;;
+#         *)
+#           echo "Invalid emulator version selected" ;;
+#       esac
+#     - mvn test -P run-tests
+#     - adb devices
+#     - sleep 30
+
+
+
+
+
+variables:
+  GIT_DEPTH: 10
+  SELECTED_EMULATOR_VERSION:
+    description: "Select Android emulator version"
+    value: "ANDROID25"
+    options:
+      - "ANDROID25"
+      - "ANDROID28"
+      - "ANDROID29"
+
+before_script:
+  - git config --global http.postBuffer 524288000
+
+test:
+  tags:
+    - android
+  image: $CI_REGISTRY_IMAGE
+  stage: test
+  script:
+    - git fetch --depth=$GIT_DEPTH
+    - appium &
+    - |
+      case "$SELECTED_EMULATOR_VERSION" in
+        ANDROID25)
+          /opt/start-android25-emulator.sh ;;
+        ANDROID28)
+          /opt/start-android28-emulator.sh ;;
+        ANDROID29)
+          /opt/start-android29-emulator.sh ;;
+        *)
+          echo "Invalid emulator version selected" ;;
+      esac
+    - mvn -Dtest=TestRunner test
+    - adb devices
+    - sleep 30
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
